@@ -1,0 +1,365 @@
+---
+title: "Stat170 Project Analysis2"
+output: html_document
+date: "2024-12.3"
+---
+
+```{r }
+usedcar <- read.csv("/Users/maxiaohui/Desktop/STAT170/Stat170 Data/car data.csv")
+```
+# Model 1
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4$
+
+**Variables **
+
+Predictors:
+
+- Total kilometers the car has been driven (Kms_Driven): $x_1$
+- Present Price of the car: $x_2$
+- Fuel type of the car (Petrol, Diesel, CNG)
+    -dummy variable 1: $x_3$
+    -dummy variable 2: $x_4$
+
+
+Response:
+- The average selling price of the vehicle(Selling_Price): $E(y)$.
+
+
+```{r}
+model1 <- lm(Selling_Price~ Present_Price + Kms_Driven + Fuel_Type, data = usedcar)
+summary(model1)
+```
+## VIF analysis for model 1
+```{r}
+library(car)
+vif(model1)
+```
+
+
+# Creating interaction terms and second-order terms
+
+# Model 2
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2$
+
+```{r}
+model2 <- lm(Selling_Price ~ Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven), data = usedcar)
+summary(model2)
+```
+
+## Is Model 2 better than model 1?
+
+```{r}
+anova(model1, model2)
+```
+$H_0: \beta_5 = 0$ 
+
+$H_a: \beta_5 \neq 0$
+
+Test statistic: 329.46
+
+p-value: <2.2e-16
+
+Conclusion: Since the p- value is smaller than 0.05 (typical alpha value), we reject the null hypothesis. This indicate that Model2 provides a significantly better fit than Model1.
+
+
+# Model 3
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4$
+```{r}
+model3 <- lm(Selling_Price ~ Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + (Present_Price * Fuel_Type), data = usedcar)
+summary(model3)
+```
+
+## Is Model 3 better than model 2?
+
+```{r}
+anova(model2, model3)
+```
+$H_0: \beta_6 = \beta_7 = 0$ 
+
+$H_a$: At least one of them are not equal to zero
+
+Test statistic: 7.5651
+
+p-value: 0.0006259
+
+Conclusion: Since the p- value is smaller than 0.05 (typical alpha value), we reject the null hypothesis. This indicate that Model3 provides a significantly better fit than Model2.
+
+# Model 4
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4+\beta_8x_2x_3+\beta_9x_2x_4$
+
+```{r}
+
+model4 <- lm(Selling_Price ~ Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + (Present_Price * Fuel_Type) + (Kms_Driven * Fuel_Type), 
+             data = usedcar)
+summary(model4)
+```
+## Is Model 4 better than model 3?
+
+```{r}
+anova(model3, model4)
+```
+$H_0: \beta_8 = \beta_9 = 0$ 
+
+$H_a$: At least one of them are not equal to zero
+
+Test statistic: 35.078
+
+p-value: 8.891e-09
+
+Conclusion: Since the p- value is smaller than 0.05 (typical alpha value), we reject the null hypothesis. This indicate that Model4 provides a significantly better fit than Model3.
+
+# Model 5
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4+\beta_8x_2x_3+\beta_9x_2x_4+\beta_10x_1^2$
+```{r}
+model5 <- lm(Selling_Price ~ Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + (Present_Price * Fuel_Type) + (Kms_Driven * Fuel_Type) +
+               I(Present_Price^2), data = usedcar)
+summary(model5)
+```
+
+## Is Model 5 better than model 4?
+
+```{r}
+anova(model4, model5)
+```
+$H_0: \beta_10 = 0$ 
+
+$H_a:\beta_10 \neq 0$
+
+Test statistic: 62.495
+
+p-value: 5.571e-14
+
+Conclusion: Since the p- value is smaller than 0.05 (typical alpha value), we reject the null hypothesis. This indicate that Model5 provides a significantly better fit than Model4.
+
+# Model 6
+
+$E(Y) = \beta_0+\beta_1x_1+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4+\beta_8x_2x_3+\beta_9x_2x_4+\beta_10x_1^2+\beta_11x_2^2$
+
+```{r}
+model6 <- lm(Selling_Price ~ Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + (Present_Price * Fuel_Type) + (Kms_Driven * Fuel_Type) +
+               I(Present_Price^2) + I(Kms_Driven^2), data = usedcar)
+summary(model6)
+```
+
+## Is Model 6 better than model 5?
+
+```{r}
+anova(model5, model6)
+```
+$H_0: \beta_11 = 0$ 
+
+$H_a:\beta_11 \neq 0$
+
+Test statistic: 7.2971
+
+p-value: 0.007313
+
+Conclusion: Since the p- value is smaller than 0.05 (typical alpha value), we reject the null hypothesis. This indicate that Model6 provides a significantly better fit than Model5.
+
+
+#Residual diagnostics
+
+#Shapiro-Wilk test
+```{r}
+shapiro.test(residuals(model6))
+```
+
+Low p-value indicates that the residuals are not normally distributed.
+
+#Q-Q plot
+```{r}
+qqnorm(residuals(model6), main = "Normal Q-Q Plot of Residuals")
+qqline(residuals(model6), col = "red", lty = 2)
+```
+
+The residuals deviate significantly from the diagonal line, particularly at the tails.
+
+#Residuals vs. Fitted plot
+```{r}
+plot(fitted(model6), residuals(model6), 
+     main = "Residuals vs Fitted Values",
+     xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+Residuals do not show random scatter around the horizontal line at 0.
+
+
+The Shapiro-Wilk test and the Q-Q plot indicate the residuals are not normally distributed. The residuals do not scatter randomly around 0. The increasing variance with higher fitted values suggests heteroscedasticity. We should apply a log transformation to stabilize variance and improve normality.
+
+
+#Apply log transformation
+
+  $log(E(Y)) = \beta_0+\beta_1log(x_1)+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4+\beta_8x_2x_3+\beta_9x_2x_4+\beta_10x_1^2+\beta_11x_2^2$
+  
+```{r}
+usedcar$log_Selling_Price <- log(usedcar$Selling_Price)
+usedcar$log_Present_Price <- log(usedcar$Present_Price)
+
+model_log <- lm(log_Selling_Price ~ log_Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + (Present_Price * Fuel_Type) + 
+                  (Kms_Driven * Fuel_Type)+ I(Present_Price^2) + I(Kms_Driven^2), data = usedcar)
+
+summary(model_log)
+```
+
+# Final Model
+
+The final model is model_log, which has highest Adjusted R-squared(0.9605) : 
+ $log(E(Y)) = \beta_0+\beta_1log(x_1)+\beta_2x_2+\beta_3x_3+\beta_4x_4+\beta_5x_1x_2+\beta_6x_1x_3+\beta_7x_1x_4+\beta_8x_2x_3+\beta_9x_2x_4+\beta_10x_1^2+\beta_11x_2^2$
+ 
+Where:
+x1 = Kms_Driven
+x2 = Present_Price
+x3 = Dummy variable 1 for Fuel_Type
+x4 = Dummy variable 2 for Fuel_Type
+
+
+#Residuals vs. Fitted plot:
+```{r}
+plot(fitted(model_log), residuals(model_log), 
+     main = "Residuals vs Fitted Values (Log Model)",
+     xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+The residuals scatter more randomly around 0 compared to the model before transformation
+
+#Q-Q plot
+
+```{r}
+qqnorm(residuals(model_log), main = "Normal Q-Q Plot (Log Model)")
+qqline(residuals(model_log), col = "red", lty = 2)
+```
+
+The residuals mostly align with the diagonal line.
+
+#Shapiro-Wilk test:
+```{r}
+shapiro.test(residuals(model_log))
+```
+
+The low p-value indicates that the residuals are still not perfectly normal.
+However, the improvement in the W-statistic compared to the original model suggests better conformity to normality.
+
+
+
+```{r}
+hist(resid(model6), breaks = 50)
+
+#Find the outliers
+standardized_residuals <- rstandard(model_log)
+which(abs(standardized_residuals) > 3 )
+
+#Fit Model_log after removing outlier 180 and 201
+usedcar2<-usedcar[-c(180, 201),]
+model_log2<-lm(log_Selling_Price ~ log_Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + I(Present_Price^2) + I(Kms_Driven^2)+ (Present_Price * Fuel_Type) + (Kms_Driven * Fuel_Type), data = usedcar2)
+summary(model_log2)
+```
+
+```{r}
+qqnorm(residuals(model_log2), main = "Normal Q-Q Plot (Log Model)")
+qqline(residuals(model_log2), col = "red", lty = 2)
+shapiro.test(residuals(model_log2))
+```
+
+After remove outliers, the residual still not normally distributed. Therefore, more data are needed or alternate model might be considered
+
+
+#Final report update
+
+The NA in the output for the coefficient Kms_Driven:Fuel_TypePetrol indicates that this coefficient is not estimable due to multicollinearity. In this case, there is a dependency among the variables that makes it impossible to estimate this specific parameter. At the sametime, the fuel type "CNG" only have two observations in the data set. Therefore, we decide to remove the fuel type "CNG" from the data.
+
+#remove fuel type CNG
+
+```{r}
+new_usedcar <- read.csv("C://Users/tie04/OneDrive/Desktop/Stat/reduced_usedcars.csv")
+```
+
+
+```{r}
+new_usedcar$log_Selling_Price <- log(new_usedcar$Selling_Price)
+new_usedcar$log_Present_Price <- log(new_usedcar$Present_Price)
+
+# Refit the model
+newModel_log <- lm(log_Selling_Price ~ log_Present_Price + Kms_Driven + Fuel_Type +
+                  (Present_Price * Kms_Driven) + 
+                  (Present_Price * Fuel_Type) + 
+                  (Kms_Driven * Fuel_Type) + 
+                  I(Present_Price^2) + I(Kms_Driven^2), 
+                data = new_usedcar)
+
+# Summary of the updated model
+summary(newModel_log)
+```
+
+
+
+#Residuals vs. Fitted plot:
+```{r}
+plot(fitted(newModel_log), residuals(newModel_log), 
+     main = "Residuals vs Fitted Values (Log Model)",
+     xlab = "Fitted Values", ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+#Q-Q plot
+
+```{r}
+qqnorm(residuals(newModel_log), main = "Normal Q-Q Plot (Log Model)")
+qqline(residuals(newModel_log), col = "red", lty = 2)
+```
+
+
+#Shapiro-Wilk test:
+```{r}
+shapiro.test(residuals(newModel_log))
+```
+```{r}
+library(car)
+vif_values <- vif(newModel_log, type = "predictor")
+print(vif_values)
+```
+
+#remove outliers
+
+```{r}
+standardized_residuals <- rstandard(newModel_log)
+which(abs(standardized_residuals) > 3 )
+
+
+usedcar3<-new_usedcar[-c(178, 199),]
+model_log3<-lm(log_Selling_Price ~ log_Present_Price + Kms_Driven + Fuel_Type + (Present_Price * Kms_Driven) + I(Present_Price^2) + I(Kms_Driven^2)+ (Present_Price * Fuel_Type) + (Kms_Driven * Fuel_Type), data = usedcar3)
+summary(model_log3)
+```
+```{r}
+qqnorm(residuals(model_log3), main = "Normal Q-Q Plot (Log Model)")
+qqline(residuals(model_log3), col = "red", lty = 2)
+shapiro.test(residuals(model_log3))
+```
+
+#No significant imporve, try stepwise selection
+
+```{r}
+stepwise_model <- step(model_log3)
+summary(stepwise_model)
+```
+
+```{r}
+model_final <- lm(log_Selling_Price ~ log_Present_Price + Kms_Driven + Fuel_Type +
+                  I(Kms_Driven^2) + Kms_Driven:Present_Price +
+                  Fuel_Type:Present_Price + Kms_Driven:Fuel_Type,
+                  data = usedcar3)
+summary(model_final)
+```
+```{r}
+qqnorm(residuals(model_final), main = "Normal Q-Q Plot")
+qqline(residuals(model_final), col = "red", lty = 2)
+shapiro.test(residuals(model_final))
+```
+
+The models perform similarly, and no significant improvement in normality or fit was observed except the stepwise model is more parsimonious.
